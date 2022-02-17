@@ -1,0 +1,131 @@
+
+(rules PCB ESP32wShiftRegisters
+  (snap_angle 
+    fortyfive_degree
+  )
+  (autoroute_settings
+    (fanout off)
+    (app.freerouting.autoroute on)
+    (postroute on)
+    (vias on)
+    (via_costs 50)
+    (plane_via_costs 5)
+    (start_ripup_costs 100)
+    (start_pass_no 7)
+    (layer_rule F.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.8)
+      (against_preferred_direction_trace_costs 2.9)
+    )
+    (layer_rule In1.Cu
+      (active off)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 1.9)
+    )
+    (layer_rule In2.Cu
+      (active on)
+      (preferred_direction vertical)
+      (preferred_direction_trace_costs 1.0)
+      (against_preferred_direction_trace_costs 2.1)
+    )
+    (layer_rule B.Cu
+      (active on)
+      (preferred_direction horizontal)
+      (preferred_direction_trace_costs 1.8)
+      (against_preferred_direction_trace_costs 2.7)
+    )
+  )
+  (rule
+    (width 250.0)
+    (clear 200.2)
+    (clear 125.0 (type smd_to_turn_gap))
+    (clear 500.2 (type default_power))
+    (clear 50.0 (type smd_smd))
+    (clear 500.2 (type smd_power))
+    (clear 500.2 (type "kicad_default"_power))
+    (clear 500.2 (type power_power))
+  )
+  (padstack "Via[0-3]_800:400_um"
+    (shape
+      (circle F.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle In1.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle In2.Cu 800.0 0.0 0.0)
+    )
+    (shape
+      (circle B.Cu 800.0 0.0 0.0)
+    )
+    (attach off)
+  )
+  (via 
+    "Via[0-3]_800:400_um" "Via[0-3]_800:400_um" default
+  )
+  (via 
+    "Via[0-3]_800:400_um-kicad_default" "Via[0-3]_800:400_um" "kicad_default"
+  )
+  (via 
+    "Via[0-3]_800:400_um-power" "Via[0-3]_800:400_um" power
+  )
+  (via_rule
+    default "Via[0-3]_800:400_um"
+  )
+  (via_rule
+    "kicad_default" "Via[0-3]_800:400_um-kicad_default"
+  )
+  (via_rule
+    power "Via[0-3]_800:400_um-power"
+  )
+  (class default
+    (clearance_class default)
+    (via_rule default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
+    )
+  )
+  (class "kicad_default"
+    "I2C_SDA" "I2C_SCL" +3V XSHUT1 XSHUT2 "M_PWMA" IN1 IN2
+    IN3 IN4 "M_PWMB" XSHUT3 EN VP VN IO34
+    IO35 IO32 IO33 IO25 "CNT1_IN" "S2P_LATCH" "3VCNT_RESET" "3VP2S_SHLD"
+    "3VP2S_CE" "3VS2P_LATCH" "P2S_CE" "P2S_SHLD" "CNT_RESET" "CNT2_IN" "Net-(D201-Pad2)" "Net-(D201-Pad1)"
+    "Net-(D202-Pad2)" "Net-(D202-Pad1)" "Net-(D203-Pad2)" "Net-(D203-Pad1)" "Net-(D204-Pad2)" "Net-(D204-Pad1)" "Net-(D205-Pad2)" "Net-(D205-Pad1)"
+    "Net-(D206-Pad2)" "Net-(D206-Pad1)" "Net-(D207-Pad2)" "Net-(D207-Pad1)" "Net-(D208-Pad2)" "Net-(D208-Pad1)" "Net-(R301-Pad2)" "Net-(R302-Pad2)"
+    "Net-(U301-Pad15)" "Net-(U301-Pad7)" "Net-(U301-Pad14)" "Net-(U301-Pad6)" "Net-(U301-Pad13)" "Net-(U301-Pad5)" "Net-(U301-Pad4)" "Net-(U301-Pad1)"
+    "/Counter1/CASC_IN" "Net-(R401-Pad2)" "Net-(R402-Pad2)" "Net-(U401-Pad15)" "Net-(U401-Pad7)" "Net-(U401-Pad14)" "Net-(U401-Pad6)" "Net-(U401-Pad13)"
+    "Net-(U401-Pad5)" "Net-(U401-Pad4)" "Net-(U401-Pad1)" "/Counter2/CASC_IN" "Net-(D501-Pad2)" "Net-(D501-Pad1)" "Net-(D502-Pad2)" "Net-(D502-Pad1)"
+    "Net-(D503-Pad2)" "Net-(D503-Pad1)" "Net-(D504-Pad2)" "Net-(D504-Pad1)" "Net-(D505-Pad2)" "Net-(D505-Pad1)" "Net-(D506-Pad2)" "Net-(D506-Pad1)"
+    "Net-(D507-Pad2)" "Net-(D507-Pad1)" "Net-(D508-Pad2)" "Net-(D508-Pad1)" SENSOR0 SENSOR1 SENSOR2 SENSOR3
+    SENSOR4 SENSOR5 SENSOR6 SENSOR7 "Net-(R501-Pad1)" /Actuator1/OUT0 /Actuator1/OUT7 "/Actuator1/SER_IN"
+    /Actuator1/OUT6 /Actuator1/OUT5 /Actuator1/OUT4 /Actuator1/OUT3 /Actuator1/OUT2 /Actuator1/OUT1 "Net-(D601-Pad2)" "Net-(D601-Pad1)"
+    "Net-(D602-Pad2)" "Net-(D602-Pad1)" "Net-(D603-Pad2)" "Net-(D603-Pad1)" "Net-(D604-Pad2)" "Net-(D604-Pad1)" "Net-(D605-Pad2)" "Net-(D605-Pad1)"
+    "Net-(D606-Pad2)" "Net-(D606-Pad1)" "Net-(D607-Pad2)" "Net-(D607-Pad1)" "Net-(D608-Pad2)" "Net-(D608-Pad1)" "Net-(R601-Pad1)" "/Motor Control/OUT7"
+    "/Motor Control/OUT6" "/Motor Control/OUT5" "/Motor Control/OUT4" "Net-(C101-Pad1)" IO23 IO12 TX RX
+    "Net-(J123-Pad4)" "Net-(J123-Pad2)" "Net-(J124-Pad4)" "Net-(J124-Pad2)" "REG_SDA" "REG_SCL" "3VREG_SDA" "3VREG_SCL"
+    (clearance_class "kicad_default")
+    (via_rule kicad_default)
+    (rule
+      (width 250.0)
+    )
+    (circuit 
+      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
+    )
+  )
+  (class power
+    GND 5V +5V
+    (clearance_class power)
+    (via_rule power)
+    (rule
+      (width 500.0)
+    )
+    (circuit 
+      (use_layer F.Cu In1.Cu In2.Cu B.Cu)
+    )
+  )
+)
