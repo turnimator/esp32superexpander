@@ -1,6 +1,22 @@
 /*
- * ESP32forth v7.0.5--Peterforth version 2June2021
- * Revision: 33cf8aaa6fe3e0bc4abf3e4cd5c496a3071b9171
+ * Copyright 2021 Bradley D. Nelson
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+*/
+
+/*
+ * ESP32forth v7.0.5.4
+ * Revision: c7474b756beb296dd1316d241a218cd4e4041b77
  */
 
 #include <inttypes.h>
@@ -142,16 +158,14 @@ typedef int64_t dcell_t;
 #define ENABLE_SOCKETS_SUPPORT
 #define ENABLE_FREERTOS_SUPPORT
 #define ENABLE_INTERRUPTS_SUPPORT
-//#define ENABLE_COMPASS_SUPPORT
+#define ENABLE_SUPEREXPANDER_SUPPORT
 
 // Uncomment this #define for OLED Support.
 // You will need to install these libraries from the Library Manager:
 //   Adafruit SSD1306
 //   Adafruit GFX Library
 //   Adafruit BusIO
-// #define ENABLE_OLED_SUPPORT
-
-#define ENABLE_SUPEREXPANDER_SUPPORT
+//#define ENABLE_OLED_SUPPORT
 
 // For now assume only boards with PSRAM (ESP32-CAM)
 // will want SerialBluetooth (very large) and camera support.
@@ -187,7 +201,7 @@ typedef int64_t dcell_t;
 
 #define PLATFORM_OPCODE_LIST \
   /* Memory Allocation */ \
-  Y(MALLOC, SET malloc(n0))  \
+  Y(MALLOC, SET malloc(n0)) \
   Y(SYSFREE, free(a0); DROP) \
   Y(REALLOC, SET realloc(a1, n0); NIP) \
   Y(heap_caps_malloc, SET heap_caps_malloc(n1, n0); NIP) \
@@ -262,7 +276,6 @@ typedef int64_t dcell_t;
   OPTIONAL_FREERTOS_SUPPORT \
   OPTIONAL_INTERRUPTS_SUPPORT \
   OPTIONAL_OLED_SUPPORT \
-  OPTIONAL_COMPASS_SUPPORT \
   OPTIONAL_SUPEREXPANDER_SUPPORT \
 
 #ifdef ENABLE_SUPEREXPANDER_SUPPORT
@@ -275,18 +288,10 @@ X("se.getSensor", se_getSensor, n0 = se.getSensor(n0)) \
 X("se.getCounter1", se_getCounter1, n0 = se.getCounter1()) \
 X("se.getCounter2", se_getCounter2, n0 = se.getCounter2()) \
 X("se.writeBoard", se_writeBoard, se.writeBoard()) \
-X("se.readBoard", se_readBoard, se.readBoard()) 
+X("se.readBoard", se_readBoard, se.readBoard()) \
+X("se.begin", se_begin, se.begin()) 
 #else
-OPTIONAL_SUPEREXPANDER_SUPPORT
-#endif
-
-#ifdef ENABLE_COMPASS_SUPPORT
-#define OPTIONAL_COMPASS_SUPPORT \
-  X("setupcompass", setupcomp, setupcompass()) \
-  X("readcompass",readcomp, PUSH readcompass()) \
-  X("compassxyz", compassXYZ, sensors_event_t e; mag.getEvent(&e); PUSH(e.magnetic.z);PUSH(e.magnetic.y);PUSH(e.magnetic.x))
-#else
- #define OPTIONAL_COMPASS_SUPPORT
+#define OPTIONAL_SUPEREXPANDER_SUPPORT
 #endif
 
 
@@ -408,20 +413,13 @@ OPTIONAL_SUPEREXPANDER_SUPPORT
   X("Wire.getClock", WIRE_GET_CLOCK, PUSH Wire.getClock()) \
   X("Wire.setTimeout", WIRE_SET_TIMEOUT, Wire.setTimeout(n0); DROP) \
   X("Wire.getTimeout", WIRE_GET_TIMEOUT, PUSH Wire.getTimeout()) \
-  X("Wire.lastError", WIRE_LAST_ERROR, PUSH Wire.lastError()) \
-  X("Wire.getErrorText", WIRE_GET_ERROR_TEXT, PUSH Wire.getErrorText(n0)) \
   X("Wire.beginTransmission", WIRE_BEGIN_TRANSMISSION, Wire.beginTransmission(n0); DROP) \
   X("Wire.endTransmission", WIRE_END_TRANSMISSION, SET Wire.endTransmission(n0)) \
   X("Wire.requestFrom", WIRE_REQUEST_FROM, n0 = Wire.requestFrom(n2, n1, n0); NIPn(2)) \
-  X("Wire.writeTransmission", WIRE_WRITE_TRANSMISSION, \
-      n0 = Wire.writeTransmission(n3, b2, n1, n0); NIPn(3)) \
-  X("Wire.readTransmission", WIRE_READ_TRANSMISSION, \
-      n0 = Wire.readTransmission(n4, b3, n2, n1, (uint32_t *) a0); NIPn(4)) \
   X("Wire.write", WIRE_WRITE, n0 = Wire.write(b1, n0); NIP) \
   X("Wire.available", WIRE_AVAILABLE, PUSH Wire.available()) \
   X("Wire.read", WIRE_READ, PUSH Wire.read()) \
   X("Wire.peek", WIRE_PEEK, PUSH Wire.peek()) \
-  X("Wire.busy", WIRE_BUSY, PUSH Wire.busy()) \
   X("Wire.flush", WIRE_FLUSH, Wire.flush())
 #endif
 
@@ -530,109 +528,6 @@ static cell_t FromIP(IPAddress ip) {
   X("WebServer.handleClient", WEBSERVER_HANDLE_CLIENT, ws0->handleClient(); DROP)
 #endif
 
-// ****** TIME OF FLIGHT  VL53L0X LASER DISTANCE SENSOR ******** 
-//#define ENABLE_TOF_LASER
-
-#ifndef ENABLE_TOF_LASER
-# define OPTIONAL_TOF_LASER_SUPPORT
-#else
-// static VL53L0X.h  pololu library
-# define OPTIONAL_TOF_LASER_SUPPORT \
-#include <Wire.h>
-#include <VL53L0X.h>
-VL53L0X sensor;
-void setuplaser()
-{
- // Serial.begin(9600);
-  Wire.begin();
-  sensor.setTimeout(500);
-  if (!sensor.init())
-  {
-    Serial.println("**Failed to detect and initialize **TOF** sensor!");
-               // while (1) {}
-  }
-                // Start continuous back-to-back mode (take readings as
-                // fast as possible).  To use continuous timed mode
-               // instead, provide a desired inter-measurement period in
-               // ms (e.g. sensor.startContinuous(100)).
-                // sensor.startContinuous();
-    sensor.setMeasurementTimingBudget(200000);  // high speed
-}
-
-int readlaser(void)
-{
-  // int resultmm;
-  int o = sensor.readRangeSingleMillimeters();
-               // Serial.print(sensor.readRangeContinuousMillimeters());
-               // sensor.read();
-              // resultmm = sensor.ranging_data.range_mm;  */ \
-              // resultmm =sensor.readRangeSingleMillimeters();
-              //  Serial.println(o);
-    if (sensor.timeoutOccurred()) { Serial.print(" TIMEOUT"); }
-  return o;    //  resultmm;   //  Serial.println();
-}
- 
-#endif
- 
-
-// ****** COMPASS HMC 5883L  MAGNETOMETER ********** 
-
-//#define ENABLE_COMPASS
-
-#ifdef ENABLE_COMPASS_SUPPORT
-#include <Wire.h> 
-#include <Adafruit_HMC5883_U.h>
- 
-/* Assign a unique ID to this sensor at the same time */
-Adafruit_HMC5883_Unified mag = Adafruit_HMC5883_Unified(12345);
- 
-void setupcompass(void)
-{
-Serial.begin(115200);
- 
-/* Initialise the sensor */
-if(!mag.begin())
-{
-/* There was a problem detecting the HMC5883 ... check your connections */
-Serial.println("Ooops, no HMC5883 detected ... Check your wiring!");
-// while(1);
-}
-}
- 
-// void loop(void)
-int readcompass(void) 
-{
-/* Get a new sensor event */
-sensors_event_t event;
-mag.getEvent(&event);  
-/* Display the results (magnetic vector values are in micro-Tesla (uT)) */
-Serial.print("X: ");
-Serial.print(event.magnetic.x);
-Serial.print(" ");
-Serial.print("Y: ");
-Serial.print(event.magnetic.y);
-Serial.print(" ");
-Serial.print("Z: ");
-Serial.print(event.magnetic.z);
-Serial.print(" ");
-Serial.println("uT"); 
-float heading = atan2(event.magnetic.y, event.magnetic.x);
-float declinationAngle = 0.22;
-heading += declinationAngle; 
-// Correct for when signs are reversed.
-if(heading < 0)
-heading += 2*PI; 
-// Check for wrap due to addition of declination.
-if(heading > 2*PI)
-heading -= 2*PI;
- // Convert radians to degrees for readability.
-float headingDegrees = heading * 180/M_PI;
- Serial.print("Heading (degrees): ");
-Serial.println(headingDegrees);
- // delay(500);
-}
-#endif
- 
 #ifndef ENABLE_OLED_SUPPORT
 # define OPTIONAL_OLED_SUPPORT
 #else
@@ -665,8 +560,6 @@ static Adafruit_SSD1306 *oled_display = 0;
   Y(OledRectRF, oled_display->fillRoundRect(n5, n4, n3, n2, n1, n0 ); DROPn(5))
 #endif
 
-
- 
 static char filename[PATH_MAX];
 static String string_value;
 
@@ -676,9 +569,11 @@ static cell_t TimerIsrRegister(cell_t group, cell_t timer, cell_t xt, cell_t arg
 
 #define PRINT_ERRORS 0
 
-#define CELL_LEN(n) (((n) + sizeof(cell_t) - 1) / sizeof(cell_t))
+#define CELL_MASK (sizeof(cell_t) - 1)
+#define CELL_LEN(n) (((n) + CELL_MASK) / sizeof(cell_t))
 #define FIND(name) find(name, sizeof(name) - 1)
-#define LOWER(ch) ((ch) & 0x5F)
+#define UPPER(ch) (((ch) >= 'a' && (ch) <= 'z') ? ((ch) & 0x5F) : (ch))
+#define CELL_ALIGNED(a) (((cell_t) (a) + CELL_MASK) & ~CELL_MASK)
 #define IMMEDIATE 1
 #define SMUDGE 2
 #define VOCABULARY_DEPTH 16
@@ -706,9 +601,9 @@ static cell_t convert(const char *pos, cell_t n, cell_t *ret) {
   if (pos[0] == '-') { negate = -1; ++pos; --n; }
   if (pos[0] == '$') { base = 16; ++pos; --n; }
   for (; n; --n) {
-    uintptr_t d = pos[0] - '0';
+    uintptr_t d = UPPER(pos[0]) - '0';
     if (d > 9) {
-      d = LOWER(d) - 7;
+      d -= 7;
       if (d < 10) { return 0; }
     }
     if (d >= base) { return 0; }
@@ -720,8 +615,8 @@ static cell_t convert(const char *pos, cell_t n, cell_t *ret) {
 }
 
 static cell_t same(const char *a, const char *b, cell_t len) {
-  for (;len && LOWER(*a) == LOWER(*b); --len, ++a, ++b);
-  return len;
+  for (;len && UPPER(*a) == UPPER(*b); --len, ++a, ++b);
+  return len == 0;
 }
 
 static cell_t find(const char *name, cell_t len) {
@@ -730,7 +625,7 @@ static cell_t find(const char *name, cell_t len) {
     cell_t clen = CELL_LEN(len);
     while (pos) {
       if (!(pos[-1] & SMUDGE) && len == pos[-3] &&
-          same(name, (const char *) &pos[-3 - clen], len) == 0) {
+          same(name, (const char *) &pos[-3 - clen], len)) {
         return (cell_t) pos;
       }
       pos = (cell_t *) pos[-2];  // Follow link
@@ -740,6 +635,7 @@ static cell_t find(const char *name, cell_t len) {
 }
 
 static void create(const char *name, cell_t length, cell_t flags, void *op) {
+  g_sys.heap = (cell_t *) CELL_ALIGNED(g_sys.heap);
   char *pos = (char *) g_sys.heap;
   for (cell_t n = length; n; --n) { *pos++ = *name++; }  // name
   g_sys.heap += CELL_LEN(length);
@@ -867,8 +763,9 @@ static cell_t *forth_run(cell_t *init_rp) {
              ++rp; *rp = (cell_t) ip; ip = (cell_t *) *(cell_t *) (w + sizeof(cell_t)); NEXT;
 }
 
-const char boot[]  =
+const char boot[] =
 ": (   41 parse drop drop ; immediate\n"
+": \\   10 parse drop drop ; immediate\n"
 "\n"
 "( Useful Basic Compound Words )\n"
 ": nip ( a b -- b ) swap drop ;\n"
@@ -895,9 +792,6 @@ const char boot[]  =
 ": 2* 2 * ;   : 2/ 2 / ;\n"
 ": 4* 4 * ;   : 4/ 4 / ;\n"
 ": +! ( n a -- ) swap over @ + swap ! ;\n"
-"\n"
-"( Line Comments )\n"
-": \\   nl parse drop drop ; immediate\n"
 "\n"
 "( Cells )\n"
 ": cell+ ( n -- n ) cell + ;\n"
@@ -952,6 +846,9 @@ const char boot[]  =
 ": repeat   ['] branch , , here swap ! ; immediate\n"
 ": aft   drop ['] branch , here 0 , here swap ; immediate\n"
 "\n"
+"( Recursion )\n"
+": recurse   current @ @ aliteral ['] execute , ; immediate\n"
+"\n"
 "( Compound words requiring conditionals )\n"
 ": min 2dup < if drop else nip then ;\n"
 ": max 2dup < if nip else drop then ;\n"
@@ -976,15 +873,18 @@ const char boot[]  =
 "rp@ constant rp0\n"
 ": depth ( -- n ) sp@ sp0 - cell/ ;\n"
 "\n"
+"( Rstack nest depth )\n"
+"variable nest-depth\n"
+"\n"
 "( FOR..NEXT )\n"
-": for   postpone >r postpone begin ; immediate\n"
-": next   postpone donext , ; immediate\n"
+": for   1 nest-depth +! postpone >r postpone begin ; immediate\n"
+": next   -1 nest-depth +! postpone donext , ; immediate\n"
 "\n"
 "( DO..LOOP )\n"
 "variable leaving\n"
 ": leaving,   here leaving @ , leaving ! ;\n"
-": leaving(   leaving @ 0 leaving ! ;\n"
-": )leaving   leaving @ swap leaving !\n"
+": leaving(   leaving @ 0 leaving !   2 nest-depth +! ;\n"
+": )leaving   leaving @ swap leaving !  -2 nest-depth +!\n"
 "             begin dup while dup @ swap here swap ! repeat drop ;\n"
 ": (do) ( n n -- .. ) swap r> -rot >r >r >r ;\n"
 ": do ( lim s -- ) leaving( postpone (do) here ; immediate\n"
@@ -1010,10 +910,10 @@ const char boot[]  =
 "\n"
 "( Values )\n"
 ": value ( n -- ) create , does> @ ;\n"
-": to ( n -- )\n"
-"   ' >body state @ if aliteral postpone ! else ! then ; immediate\n"
-": +to ( n -- )\n"
-"   ' >body state @ if aliteral postpone +! else +! then ; immediate\n"
+": value-bind ( xt-val xt )\n"
+"   >r >body state @ if aliteral r> , else r> execute then ;\n"
+": to ( n -- ) ' ['] ! value-bind ; immediate\n"
+": +to ( n -- ) ' ['] +! value-bind ; immediate\n"
 "\n"
 "( Deferred Words )\n"
 ": defer ( \"name\" -- ) create 0 , does> @ dup 0= throw execute ;\n"
@@ -1048,15 +948,16 @@ const char boot[]  =
 "\n"
 "( Strings )\n"
 ": parse-quote ( -- a n ) [char] \" parse ;\n"
-": $place ( a n -- ) for aft dup c@ c, 1+ then next drop 0 c, align ;\n"
+": $place ( a n -- ) for aft dup c@ c, 1+ then next drop ;\n"
+": zplace ( a n -- ) $place 0 c, align ;\n"
 ": $@   r@ dup cell+ swap @ r> dup @ 1+ aligned + cell+ >r ;\n"
-": s\"   parse-quote state @ if postpone $@ dup , $place\n"
-"       else dup here swap >r >r $place r> r> then ; immediate\n"
+": s\"   parse-quote state @ if postpone $@ dup , zplace\n"
+"       else dup here swap >r >r zplace r> r> then ; immediate\n"
 ": .\"   postpone s\" state @ if postpone type else type then ; immediate\n"
 ": z\"   postpone s\" state @ if postpone drop else drop then ; immediate\n"
 ": r\"   parse-quote state @ if swap aliteral aliteral then ; immediate\n"
 ": r|   [char] | parse state @ if swap aliteral aliteral then ; immediate\n"
-": s>z ( a n -- z ) here >r $place r> ;\n"
+": s>z ( a n -- z ) here >r zplace r> ;\n"
 ": z>s ( z -- a n ) 0 over begin dup c@ while 1+ swap 1+ swap repeat drop ;\n"
 "\n"
 "( Fill, Move )\n"
@@ -1083,7 +984,10 @@ const char boot[]  =
 "       dup ?echo\n"
 "       >r rot r> over c! 1+ -rot swap 1+ swap\n"
 "     then\n"
-"   repeat drop nip ;\n"
+"   repeat drop nip\n"
+"   ( Eat rest of the line if buffer too small )\n"
+"   begin key dup nl = over 13 = or if ?echo exit else drop then again\n"
+";\n"
 "200 constant input-limit\n"
 ": tib ( -- a ) 'tib @ ;\n"
 "create input-buffer   input-limit allot\n"
@@ -1236,7 +1140,6 @@ const char boot[]  =
 "\n"
 "( Utilities )\n"
 ": page   30 for cr next ;\n"
-": cls   30 for cr next ;\n"
 "\n"
 "( Basic Ardiuno Constants )\n"
 "0 constant LOW\n"
@@ -1254,7 +1157,7 @@ const char boot[]  =
 "high led pin\n"
 "\n"
 "( Setup entry )\n"
-": ok   .\" ESP32forth v7.0.5 - rev 33cf8aaa6fe3e0bc4abf3e4cd5c496a3071b9171\" cr prompt refill drop quit ;\n"
+": ok   .\" ESP32forth v7.0.5.4 - rev c7474b756beb296dd1316d241a218cd4e4041b77\" cr prompt refill drop quit ;\n"
 "( Words with OS assist )\n"
 ": allocate ( n -- a ior ) malloc dup 0= ;\n"
 ": free ( a -- ior ) sysfree drop 0 ;\n"
@@ -1266,12 +1169,11 @@ const char boot[]  =
 "transfer{\n"
 "  Wire.begin Wire.setClock Wire.getClock\n"
 "  Wire.setTimeout Wire.getTimeout\n"
-"  Wire.lastError Wire.getErrorText\n"
 "  Wire.beginTransmission Wire.endTransmission\n"
-"  Wire.requestFrom Wire.writeTransmission\n"
-"  Wire.readTransmission Wire.write\n"
+"  Wire.requestFrom  \n"
+"  Wire.write\n"
 "  Wire.available Wire.read\n"
-"  Wire.peek Wire.busy Wire.flush\n"
+"  Wire.peek   Wire.flush\n"
 "}transfer\n"
 "forth definitions\n"
 "\n"
@@ -1375,16 +1277,17 @@ const char boot[]  =
 "1 10 lshift constant ESP_INTR_FLAG_IRAM\n"
 "1 11 lshift constant ESP_INTR_FLAG_INTRDISABLED\n"
 "\n"
-"0 constant GPIO_INTR_DISABLE\n"
-"1 constant GPIO_INTR_POSEDGE\n"
-"2 constant GPIO_INTR_NEGEDGE\n"
-"3 constant GPIO_INTR_ANYEDGE\n"
-"4 constant GPIO_INTR_LOW_LEVEL\n"
-"5 constant GPIO_INTR_HIGH_LEVEL\n"
+"( Prefix these with # because GPIO_INTR_DISABLE conflicts with a function. )\n"
+"0 constant #GPIO_INTR_DISABLE\n"
+"1 constant #GPIO_INTR_POSEDGE\n"
+"2 constant #GPIO_INTR_NEGEDGE\n"
+"3 constant #GPIO_INTR_ANYEDGE\n"
+"4 constant #GPIO_INTR_LOW_LEVEL\n"
+"5 constant #GPIO_INTR_HIGH_LEVEL\n"
 "\n"
 "( Easy word to trigger on any change to a pin )\n"
 "ESP_INTR_FLAG_DEFAULT gpio_install_isr_service drop\n"
-": pinchange ( xt pin ) dup GPIO_INTR_ANYEDGE gpio_set_intr_type throw\n"
+": pinchange ( xt pin ) dup #GPIO_INTR_ANYEDGE gpio_set_intr_type throw\n"
 "                       swap 0 gpio_isr_handler_add throw ;\n"
 "\n"
 "forth definitions\n"
@@ -1436,15 +1339,9 @@ const char boot[]  =
 "  2 OledTextsize  ( Draw 2x Scale Text )\n"
 "  WHITE OledTextc  ( Draw white text )\n"
 "  0 0 OledSetCursor  ( Start at top-left corner )\n"
-"  z\" Esp32forth\" OledPrintln OledDisplay\n"
+"  z\" *Esp32forth*\" OledPrintln OledDisplay\n"
 ";\n"
-" : oo oleddisplay ;\n"
 "forth definitions\n"
-"[THEN]\n"
-"\n"
-"DEFINED? setuplaser [IF]\n"
-": setuplaser1  setuplaser cr .\" init laser \" cr ;\n"
-"setuplaser1\n"
 "[THEN]\n"
 "\n"
 "internals definitions\n"
@@ -1467,12 +1364,6 @@ const char boot[]  =
 "010000000000000 constant MALLOC_CAP_RETENTION\n"
 "decimal\n"
 "forth definitions\n"
-" : noop ; \n"
-" defer user1  defer user2 defer user3 defer user4 \n"
-" defer user5  defer user6 defer user7 defer user8 \n"
-" ' noop is user1 ' noop is user2 ' noop is user3 \n"
-" ' noop is user4 ' noop is user5 ' noop is user6 \n"
-" ' noop is user7 ' noop is user8 \n"
 "\n"
 "( Including Files )\n"
 ": included ( a n -- )\n"
@@ -1600,27 +1491,54 @@ const char boot[]  =
 "\n"
 "internals definitions\n"
 "\n"
-"variable scope-depth\n"
-": scope-doer   create does> @ rp@ + @ ;\n"
-"scope-doer scope-template\n"
-": scope-clear\n"
-"   begin scope-depth @ while postpone rdrop cell scope-depth +! repeat\n"
-"   0 scope ! ;\n"
-": scope-create ( a n -- )\n"
-"   dup >r $place r> , ( name )\n"
-"   scope @ , 0 , here scope ! ( link, flags )\n"
-"   ['] scope-template dup @ , cell+ @ ,\n"
-"   cell negate scope-depth +!   scope-depth @ , ;\n"
+"( Leave a region for locals definitions )\n"
+"1024 constant locals-capacity  128 constant locals-gap\n"
+"create locals-area locals-capacity allot\n"
+"variable locals-here  locals-area locals-here !\n"
+": <>locals   locals-here @ here locals-here ! here - allot ;\n"
 "\n"
-"( NOTE: This is not ANSForth compatible )\n"
-": (local) ( a n -- )\n"
-"   >r >r postpone >r postpone ahead r> r> scope-create postpone then ;\n"
+": local@ ( n -- ) rp@ + @ ;\n"
+": local! ( n -- ) rp@ + ! ;\n"
+": local+! ( n -- ) rp@ + +! ;\n"
+"\n"
+"variable scope-depth\n"
+"variable local-op   ' local@ local-op !\n"
+": scope-clear\n"
+"   scope-depth @ negate nest-depth +!\n"
+"   scope-depth @ for aft postpone rdrop then next\n"
+"   0 scope-depth !   0 scope !   locals-area locals-here ! ;\n"
+": do-local ( n -- ) nest-depth @ + cells negate aliteral\n"
+"                    local-op @ ,  ['] local@ local-op ! ;\n"
+": scope-create ( a n -- )\n"
+"   dup >r $place align r> , ( name )\n"
+"   scope @ , 1 , ( IMMEDIATE ) here scope ! ( link, flags )\n"
+"   ['] scope-clear @ ( docol) ,\n"
+"   nest-depth @ negate aliteral postpone do-local ['] exit ,\n"
+"   1 scope-depth +!  1 nest-depth +!\n"
+";\n"
+"\n"
+": ?room   locals-here @ locals-area - locals-capacity locals-gap - >\n"
+"          if scope-clear -1 throw then ;\n"
+"\n"
 ": }? ( a n -- ) 1 <> if drop 0 exit then c@ [char] } = ;\n"
+": --? ( a n -- ) s\" --\" str= ;\n"
+": (to) ( xt -- ) ['] local! local-op ! execute ;\n"
+": (+to) ( xt -- ) ['] local+! local-op ! execute ;\n"
 "\n"
 "also forth definitions\n"
 "\n"
-": {   begin bl parse 2dup }? if 2drop exit then (local) again ; immediate\n"
+": (local) ( a n -- )\n"
+"   dup 0= if 2drop exit then \n"
+"   ?room <>locals scope-create <>locals postpone >r ;\n"
+": {   bl parse\n"
+"      dup 0= if scope-clear -1 throw then\n"
+"      2dup --? if 2drop [char] } parse 2drop exit then\n"
+"      2dup }? if 2drop exit then\n"
+"      recurse (local) ; immediate\n"
+"( TODO: Hide the words overriden here. )\n"
 ": ;   scope-clear postpone ; ; immediate\n"
+": to ( n -- ) ' dup >flags @ if (to) else ['] ! value-bind then ; immediate\n"
+": +to ( n -- ) ' dup >flags @ if (+to) else ['] +! value-bind then ; immediate\n"
 "\n"
 "only forth definitions\n"
 "( Byte Stream / Ring Buffer )\n"
@@ -1644,7 +1562,7 @@ const char boot[]  =
 "   >r r@ >read @ r@ >offset c@\n"
 "   r@ >read @ 1+ r@ @ mod r> >read ! ;\n"
 ": >stream ( a n st -- )\n"
-"   swap 0 do over c@ over ch>stream swap 1+ swap loop 2drop ;\n"
+"   swap for aft over c@ over ch>stream swap 1+ swap then next 2drop ;\n"
 ": stream> ( a n st -- )\n"
 "   begin over 1 > over empty? 0= and while\n"
 "   dup stream>ch >r rot dup r> swap c! 1+ rot 1- rot repeat 2drop 0 swap c! ;\n"
@@ -1665,8 +1583,7 @@ const char boot[]  =
 "<style>\n"
 "body {\n"
 "  padding: 5px;\n"
-"  background-color: #0000cc;\n" 
-// "  background-color: #111;\n" #0000cc
+"  background-color: #111;\n"
 "  color: #2cf;\n"
 "  overflow: hidden;\n"
 "}\n"
@@ -1694,16 +1611,6 @@ const char boot[]  =
 "<button onclick=\"ask('words')\">words</button>\n"
 "<button onclick=\"ask('low led pin')\">LED OFF</button>\n"
 "<button onclick=\"ask('high led pin')\">LED ON</button>\n"
-"<font face='Arial' size='20px' color='#FF7A59'>\n"
-"<button onclick=\"ask('user1')\">SLOW</button>\n"
-"<button onclick=\"ask('user2')\">FAST</button>\n"
-"<button onclick=\"ask('user3')\">FORW</button>\n"
-"<button onclick=\"ask('user4')\">BACKW</button>\n"
-"<button onclick=\"ask('user5')\">LEFT</button>\n"
-"<button onclick=\"ask('user6')\">RIGHT</button>\n"
-// "<button style= background-color:red;border-color:blue;color:white>\n" 
-"<button onclick=\"ask('user7')\">RUN</button>\n"
-"<button onclick=\"ask('user8')\">STOP</button>\n"
 "<br/>\n"
 "<textarea id=\"output\" readonly></textarea>\n"
 "<input id=\"prompt\" type=\"prompt\"></input><br/>\n"
@@ -2170,10 +2077,6 @@ static cell_t TimerIsrRegister(cell_t group, cell_t timer, cell_t xt, cell_t arg
 }
 
 void setup() {
-#ifdef ENABLE_SUPEREXPANDER_SUPPORT
-se.begin();
-#endif
-
   cell_t *heap = (cell_t *) malloc(HEAP_SIZE);
   forth_init(0, 0, heap, boot, sizeof(boot));
 }
