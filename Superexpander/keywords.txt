@@ -1,0 +1,28 @@
+#######################################
+# Syntax Coloring Map For Superexpander
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Superexpander	KEYWORD1	Superexpander
+InputRegister	KEYWORD1
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+
+begin	KEYWORD2
+setSwitch	KEYWORD2
+getSensor	KEYWORD2
+getCounter1	KEYWORD2
+getCounter2	KEYWORD2
+setMotor	KEYWORD2
+writeBoard	KEYWORD2
+readBoard	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+
