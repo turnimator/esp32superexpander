@@ -1,0 +1,6 @@
+ESP32Superexpander.2ndattempt  - Previous hardware definition (KiCad) files
+ESP32forth-7-Superexpander-0.1 - Arduino sketch containing a Superexpander ESPforth version
+ESP32superexpander       -  The current Kicad files
+Superexpander            - Arduino library for Suoerexpander
+SuperExpander.odt        - A description of the project
+superexpanderSupport.c   - Code to add to ESP32forth 
