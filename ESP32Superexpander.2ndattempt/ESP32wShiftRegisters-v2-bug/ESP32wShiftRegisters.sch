@@ -28,6 +28,10 @@ Text GLabel 7000 8050 0    50   Input ~ 0
 3VP2S_SHLD
 Text GLabel 7000 7950 0    50   Input ~ 0
 3VP2S_CE
+Text GLabel 7000 8250 0    50   Input ~ 0
+3VP2S_SCK
+Text GLabel 7000 8550 0    50   Input ~ 0
+3VP2S_SDA
 Wire Wire Line
 	7000 7250 6900 7250
 Text GLabel 7000 7150 0    50   Output ~ 0
@@ -35,9 +39,9 @@ Text GLabel 7000 7150 0    50   Output ~ 0
 Text GLabel 6950 4850 0    50   Input ~ 0
 +3V
 Text GLabel 7000 7750 0    50   Input ~ 0
-3VREG_SCL
+3VS2P_SCL
 Text GLabel 7000 7550 0    50   Input ~ 0
-3VREG_SDA
+3VS2P_SDA
 Text GLabel 7000 7650 0    50   Input ~ 0
 3VS2P_LATCH
 Text GLabel 7000 8450 0    50   Input ~ 0
@@ -142,6 +146,7 @@ Text GLabel 8400 1750 2    50   Input ~ 0
 Text GLabel 9200 1750 2    50   Input ~ 0
 +3V
 NoConn ~ 7000 7450
+NoConn ~ 7000 8350
 Text GLabel 8400 7350 2    50   Input ~ 0
 3VCNT_RESET
 $Comp
@@ -226,6 +231,17 @@ Wire Wire Line
 	12350 5950 11900 5950
 Wire Wire Line
 	12350 6050 11900 6050
+$Comp
+L Connector:Conn_01x08_Female J111
+U 1 1 61C99B36
+P 4900 8050
+F 0 "J111" H 4928 8026 50  0000 L CNN
+F 1 "EN VP VN 34 35 32 33 25" H 4928 7935 50  0000 L CNN
+F 2 "Connector_PinSocket_2.54mm:PinSocket_1x08_P2.54mm_Vertical" H 4900 8050 50  0001 C CNN
+F 3 "~" H 4900 8050 50  0001 C CNN
+	1    4900 8050
+	-1   0    0    1   
+$EndComp
 Text GLabel 8400 7850 2    50   Input ~ 0
 IO25
 Text GLabel 8400 7950 2    50   Input ~ 0
@@ -236,12 +252,29 @@ Text GLabel 8400 8150 2    50   Input ~ 0
 IO35
 Text GLabel 8400 8250 2    50   Input ~ 0
 IO34
+Text GLabel 5100 8250 2    50   Input ~ 0
+IO33
+Text GLabel 5100 8350 2    50   Input ~ 0
+IO25
+Text GLabel 5100 8150 2    50   Input ~ 0
+IO32
+Text GLabel 5100 8050 2    50   Input ~ 0
+IO35
+Text GLabel 5100 7950 2    50   Input ~ 0
+IO34
+Text GLabel 5100 7850 2    50   Input ~ 0
+VN
 Text GLabel 8400 8350 2    50   Input ~ 0
 VN
+Text GLabel 5100 7750 2    50   Input ~ 0
+VP
 Text GLabel 8400 8450 2    50   Input ~ 0
 VP
+Text GLabel 5100 7650 2    50   Input ~ 0
+EN
 Text GLabel 8400 8550 2    50   Input ~ 0
 EN
+NoConn ~ 8400 7450
 $Comp
 L ESP32wShiftRegisters-rescue:BOB-12009-BOB-12009 U101
 U 1 1 620B87B9
@@ -285,6 +318,10 @@ F 7 "Manufacturer Recommendations" H 7650 6100 50  0001 L BNN "STANDARD"
 	1    7650 6100
 	1    0    0    -1  
 $EndComp
+Text GLabel 8350 5050 2    50   Input ~ 0
+P2S_SDA
+Text GLabel 8350 5150 2    50   Input ~ 0
+P2S_SCK
 Text GLabel 8350 5250 2    50   Input ~ 0
 P2S_SHLD
 Text GLabel 8350 5350 2    50   Input ~ 0
@@ -292,9 +329,9 @@ P2S_CE
 Text GLabel 8350 6000 2    50   Input ~ 0
 S2P_LATCH
 Text GLabel 8350 6100 2    50   Input ~ 0
-REG_SCL
+S2P_SCL
 Text GLabel 8350 6200 2    50   Input ~ 0
-REG_SDA
+S2P_SDA
 Text GLabel 8350 6300 2    50   Input ~ 0
 CNT_RESET
 $Comp
@@ -323,6 +360,10 @@ Text GLabel 2050 7500 2    50   Input ~ 0
 CNT2_IN
 Text GLabel 1200 7500 2    50   Input ~ 0
 CNT1_IN
+Text GLabel 6950 5050 0    50   Input ~ 0
+3VP2S_SDA
+Text GLabel 6950 5150 0    50   Input ~ 0
+3VP2S_SCK
 Text GLabel 6950 5250 0    50   Input ~ 0
 3VP2S_SHLD
 Text GLabel 6950 5350 0    50   Input ~ 0
@@ -330,9 +371,9 @@ Text GLabel 6950 5350 0    50   Input ~ 0
 Text GLabel 6950 6000 0    50   Input ~ 0
 3VS2P_LATCH
 Text GLabel 6950 6100 0    50   Input ~ 0
-3VREG_SCL
+3VS2P_SCL
 Text GLabel 6950 6200 0    50   Input ~ 0
-3VREG_SDA
+3VS2P_SDA
 Text GLabel 6950 6300 0    50   Input ~ 0
 3VCNT_RESET
 Text GLabel 6950 5800 0    50   Input ~ 0
@@ -356,11 +397,57 @@ U 1 1 6240AFD5
 P 11450 1900
 F 0 "H101" H 11550 1949 50  0000 L CNN
 F 1 "MountingHole_Pad" H 11550 1858 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3_Pad_Via" H 11450 1900 50  0001 C CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 11450 1900 50  0001 C CNN
 F 3 "~" H 11450 1900 50  0001 C CNN
 	1    11450 1900
 	1    0    0    -1  
 $EndComp
+$Comp
+L ESP32wShiftRegisters-rescue:MountingHole_Pad-Mechanical H103
+U 1 1 6240D69E
+P 11950 1900
+F 0 "H103" H 12050 1949 50  0000 L CNN
+F 1 "MountingHole_Pad" H 12050 1858 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 11950 1900 50  0001 C CNN
+F 3 "~" H 11950 1900 50  0001 C CNN
+	1    11950 1900
+	1    0    0    -1  
+$EndComp
+$Comp
+L ESP32wShiftRegisters-rescue:MountingHole_Pad-Mechanical H104
+U 1 1 6240EAFE
+P 11950 2400
+F 0 "H104" H 12050 2449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 12050 2358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 11950 2400 50  0001 C CNN
+F 3 "~" H 11950 2400 50  0001 C CNN
+	1    11950 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L ESP32wShiftRegisters-rescue:MountingHole_Pad-Mechanical H102
+U 1 1 6240FEED
+P 11450 2400
+F 0 "H102" H 11550 2449 50  0000 L CNN
+F 1 "MountingHole_Pad" H 11550 2358 50  0000 L CNN
+F 2 "MountingHole:MountingHole_3.2mm_M3" H 11450 2400 50  0001 C CNN
+F 3 "~" H 11450 2400 50  0001 C CNN
+	1    11450 2400
+	1    0    0    -1  
+$EndComp
+$Comp
+L Device:CP C101
+U 1 1 624FC639
+P 14200 3400
+F 0 "C101" H 14318 3446 50  0000 L CNN
+F 1 "100uF" H 14318 3355 50  0000 L CNN
+F 2 "Capacitor_THT:CP_Radial_Tantal_D5.5mm_P5.00mm" H 14238 3250 50  0001 C CNN
+F 3 "~" H 14200 3400 50  0001 C CNN
+	1    14200 3400
+	1    0    0    -1  
+$EndComp
+Text GLabel 11950 2500 3    50   Input ~ 0
+GND
 Text GLabel 8350 4850 2    50   Input ~ 0
 5V
 Text GLabel 2050 7400 2    50   Input ~ 0
@@ -391,6 +478,8 @@ Text GLabel 7650 2600 2    50   Input ~ 0
 GND
 Text GLabel 6750 2600 2    50   Input ~ 0
 GND
+Text GLabel 11450 2500 3    50   Input ~ 0
+GND
 Text GLabel 11450 2000 3    50   Input ~ 0
 GND
 Text GLabel 8350 5800 2    50   Input ~ 0
@@ -399,20 +488,35 @@ Text GLabel 8350 5550 2    50   Input ~ 0
 GND
 Text GLabel 1000 3550 1    50   Input ~ 0
 5V
+Text GLabel 11950 2000 3    50   Input ~ 0
+GND
 NoConn ~ 12250 -500
 Text GLabel 12850 6350 3    50   Input ~ 0
 GND
 $Comp
 L Connector:Screw_Terminal_01x02 J122
 U 1 1 61EBDE93
-P 12250 3800
-F 0 "J122" H 12330 3792 50  0000 L CNN
-F 1 "Screw_Terminal_01x02" H 12330 3701 50  0000 L CNN
-F 2 "TerminalBlock:TerminalBlock_Altech_AK300-2_P5.00mm" H 12250 3800 50  0001 C CNN
-F 3 "~" H 12250 3800 50  0001 C CNN
-	1    12250 3800
+P 14800 3100
+F 0 "J122" H 14880 3092 50  0000 L CNN
+F 1 "Screw_Terminal_01x02" H 14880 3001 50  0000 L CNN
+F 2 "TerminalBlock:TerminalBlock_Altech_AK300-2_P5.00mm" H 14800 3100 50  0001 C CNN
+F 3 "~" H 14800 3100 50  0001 C CNN
+	1    14800 3100
+	1    0    0    -1  
+$EndComp
+$Comp
+L pspice:DIODE D101
+U 1 1 61EBFF4C
+P 14400 3100
+F 0 "D101" H 14400 2835 50  0000 C CNN
+F 1 "DIODE" H 14400 2926 50  0000 C CNN
+F 2 "Diode_THT:D_5KP_P10.16mm_Horizontal" H 14400 3100 50  0001 C CNN
+F 3 "~" H 14400 3100 50  0001 C CNN
+	1    14400 3100
 	-1   0    0    1   
 $EndComp
+Text GLabel 13400 3100 0    50   Input ~ 0
+5V
 Wire Wire Line
 	12850 6050 12850 6350
 $Comp
@@ -474,6 +578,13 @@ F7 "CASC_IN" I R 2250 9400 50
 F8 "HOST_OUT" O L 1250 9500 50 
 F9 "CE" I R 2250 10150 50 
 $EndSheet
+Wire Wire Line
+	14600 3200 14600 3550
+Wire Wire Line
+	14600 3550 14200 3550
+Connection ~ 14200 3550
+Wire Wire Line
+	14200 3250 14200 3100
 $Sheet
 S 11050 5050 850  1300
 U 621E8F0D
@@ -593,6 +704,8 @@ F 3 "~" H 3750 4000 50  0001 C CNN
 $EndComp
 Text GLabel 3850 3800 1    50   Input ~ 0
 SENSOR5
+Wire Wire Line
+	3750 3550 3750 3800
 Text GLabel 3650 3550 1    50   Input ~ 0
 5V
 Text GLabel 3750 3600 1    50   Input ~ 0
@@ -689,15 +802,15 @@ P2S_SHLD
 Text GLabel 2300 8700 2    50   Input ~ 0
 P2S_CE
 Text GLabel 2300 8800 2    50   Input ~ 0
-REG_SCL
+P2S_SCK
 Text GLabel 2250 10300 2    50   Input ~ 0
-REG_SCL
+P2S_SCK
 Text GLabel 2250 10150 2    50   Input ~ 0
 P2S_CE
 Text GLabel 2250 10050 2    50   Input ~ 0
 P2S_SHLD
 Text GLabel 1250 5950 0    50   Input ~ 0
-REG_SCL
+P2S_SCK
 Text GLabel 1250 5850 0    50   Input ~ 0
 P2S_CE
 Text GLabel 1250 5750 0    50   Input ~ 0
@@ -717,7 +830,7 @@ Wire Wire Line
 Wire Wire Line
 	2600 9400 2250 9400
 Text GLabel 1250 9500 0    50   Input ~ 0
-REG_SDA
+P2S_SDA
 Wire Notes Line
 	3050 10750 750  10750
 Text Notes 1300 6900 0    50   ~ 0
@@ -757,11 +870,11 @@ IN1
 Text GLabel 10950 7500 0    50   Input ~ 0
 S2P_LATCH
 Text GLabel 10950 8500 0    50   Input ~ 0
-REG_SCL
+S2P_SCL
 Text GLabel 11050 6250 0    50   Input ~ 0
-REG_SCL
+S2P_SCL
 Text GLabel 10950 8400 0    50   Input ~ 0
-REG_SDA
+S2P_SDA
 NoConn ~ 11900 5200
 Wire Notes Line
 	10100 4700 13600 4700
@@ -894,264 +1007,37 @@ Connection ~ 13100 8000
 $Comp
 L power:+5V #PWR0102
 U 1 1 6251F5EE
-P 14200 3300
-F 0 "#PWR0102" H 14200 3150 50  0001 C CNN
-F 1 "+5V" H 14215 3473 50  0000 C CNN
-F 2 "" H 14200 3300 50  0001 C CNN
-F 3 "" H 14200 3300 50  0001 C CNN
-	1    14200 3300
+P 14600 2600
+F 0 "#PWR0102" H 14600 2450 50  0001 C CNN
+F 1 "+5V" H 14615 2773 50  0000 C CNN
+F 2 "" H 14600 2600 50  0001 C CNN
+F 3 "" H 14600 2600 50  0001 C CNN
+	1    14600 2600
 	1    0    0    -1  
 $EndComp
+Wire Wire Line
+	14600 2600 14600 3100
+Connection ~ 14600 3100
 Wire Wire Line
 	14200 6050 12850 6050
+Wire Wire Line
+	14200 3550 14200 6050
 $Comp
-L Mechanical:MountingHole H104
-U 1 1 61FA6610
-P 12450 1850
-F 0 "H104" H 12550 1896 50  0000 L CNN
-F 1 "MountingHole" H 12550 1805 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 12450 1850 50  0001 C CNN
-F 3 "~" H 12450 1850 50  0001 C CNN
-	1    12450 1850
-	1    0    0    -1  
-$EndComp
-$Comp
-L Mechanical:MountingHole H102
-U 1 1 61FA6D3D
-P 11450 2400
-F 0 "H102" H 11550 2446 50  0000 L CNN
-F 1 "MountingHole" H 11550 2355 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 11450 2400 50  0001 C CNN
-F 3 "~" H 11450 2400 50  0001 C CNN
-	1    11450 2400
-	1    0    0    -1  
-$EndComp
-$Comp
-L Mechanical:MountingHole H103
-U 1 1 61FA7221
-P 12400 2400
-F 0 "H103" H 12500 2446 50  0000 L CNN
-F 1 "MountingHole" H 12500 2355 50  0000 L CNN
-F 2 "MountingHole:MountingHole_3.2mm_M3" H 12400 2400 50  0001 C CNN
-F 3 "~" H 12400 2400 50  0001 C CNN
-	1    12400 2400
-	1    0    0    -1  
-$EndComp
-Text GLabel 6700 8350 0    50   Input ~ 0
-TX
-Text GLabel 6700 8250 0    50   Input ~ 0
-RX
-Wire Wire Line
-	6700 8250 7000 8250
-Wire Wire Line
-	7000 8350 6700 8350
-Text GLabel 8750 7450 2    50   Output ~ 0
-IO12
-Wire Wire Line
-	8750 7450 8400 7450
-$Comp
-L Connector_Generic:Conn_02x12_Odd_Even J111
-U 1 1 62003ECA
-P 4850 7900
-F 0 "J111" H 4900 8617 50  0000 C CNN
-F 1 "Conn_02x12_Odd_Even" H 4900 8526 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x12_P2.54mm_Vertical" H 4850 7900 50  0001 C CNN
-F 3 "~" H 4850 7900 50  0001 C CNN
-	1    4850 7900
-	1    0    0    -1  
-$EndComp
-Text GLabel 5350 8650 3    50   Input ~ 0
-GND
-Wire Wire Line
-	5150 7400 5350 7400
-Wire Wire Line
-	5350 7400 5350 7500
-Wire Wire Line
-	5150 7500 5350 7500
-Connection ~ 5350 7500
-Wire Wire Line
-	5350 7500 5350 7600
-Wire Wire Line
-	5150 7600 5350 7600
-Connection ~ 5350 7600
-Wire Wire Line
-	5350 7600 5350 7700
-Wire Wire Line
-	5150 7700 5350 7700
-Connection ~ 5350 7700
-Wire Wire Line
-	5350 7700 5350 7800
-Wire Wire Line
-	5150 7800 5350 7800
-Connection ~ 5350 7800
-Wire Wire Line
-	5350 7800 5350 7900
-Wire Wire Line
-	5150 7900 5350 7900
-Connection ~ 5350 7900
-Wire Wire Line
-	5350 7900 5350 8000
-Wire Wire Line
-	5150 8000 5350 8000
-Connection ~ 5350 8000
-Wire Wire Line
-	5350 8000 5350 8100
-Wire Wire Line
-	5150 8100 5350 8100
-Connection ~ 5350 8100
-Wire Wire Line
-	5350 8100 5350 8200
-Wire Wire Line
-	5150 8200 5350 8200
-Connection ~ 5350 8200
-Wire Wire Line
-	5350 8200 5350 8300
-Wire Wire Line
-	5150 8300 5350 8300
-Connection ~ 5350 8300
-Wire Wire Line
-	5350 8300 5350 8400
-Wire Wire Line
-	5150 8400 5350 8400
-Connection ~ 5350 8400
-Wire Wire Line
-	5350 8400 5350 8500
-Wire Wire Line
-	5150 8500 5350 8500
-Connection ~ 5350 8500
-Wire Wire Line
-	5350 8500 5350 8650
-Text GLabel 4450 8500 0    50   Input ~ 0
-RX
-Text GLabel 4450 7600 0    50   Input ~ 0
-TX
-Text GLabel 4450 8400 0    50   Input ~ 0
-IO25
-Text GLabel 4450 8300 0    50   Input ~ 0
-IO33
-Text GLabel 4450 8200 0    50   Input ~ 0
-IO32
-Text GLabel 4450 8100 0    50   Input ~ 0
-IO35
-Text GLabel 4450 8000 0    50   Input ~ 0
-IO34
-Text GLabel 4400 7900 0    50   Input ~ 0
-VN
-Text GLabel 4400 7800 0    50   Input ~ 0
-VP
-Text GLabel 4400 7700 0    50   Input ~ 0
-EN
-Text GLabel 4400 7500 0    50   Output ~ 0
-IO12
-Wire Wire Line
-	4400 7400 4650 7400
-Wire Wire Line
-	4650 7500 4400 7500
-Wire Wire Line
-	4650 7700 4400 7700
-Wire Wire Line
-	4400 7800 4650 7800
-Wire Wire Line
-	4650 7900 4400 7900
-Wire Wire Line
-	4450 8000 4650 8000
-Wire Wire Line
-	4650 8100 4450 8100
-Wire Wire Line
-	4450 8200 4650 8200
-Wire Wire Line
-	4450 8300 4650 8300
-Wire Wire Line
-	4450 8400 4650 8400
-Wire Wire Line
-	4650 7600 4450 7600
-$Comp
-L Connector_Generic:Conn_02x02_Odd_Even J123
-U 1 1 620763B0
-P 6100 5050
-F 0 "J123" H 6150 5267 50  0000 C CNN
-F 1 "Conn_02x02_Odd_Even" H 6150 5176 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical" H 6100 5050 50  0001 C CNN
-F 3 "~" H 6100 5050 50  0001 C CNN
-	1    6100 5050
-	1    0    0    -1  
+L Regulator_Linear:L7805 U104
+U 1 1 61E56FD4
+P 13700 3100
+F 0 "U104" H 13700 3342 50  0000 C CNN
+F 1 "L7805" H 13700 3251 50  0000 C CNN
+F 2 "Package_TO_SOT_THT:TO-220-3_Vertical" H 13725 2950 50  0001 L CIN
+F 3 "http://www.st.com/content/ccc/resource/technical/document/datasheet/41/4f/b3/b0/12/d4/47/88/CD00000444.pdf/files/CD00000444.pdf/jcr:content/translations/en.CD00000444.pdf" H 13700 3050 50  0001 C CNN
+	1    13700 3100
+	-1   0    0    -1  
 $EndComp
 Wire Wire Line
-	6950 5050 6400 5050
+	14200 3100 14000 3100
+Connection ~ 14200 3100
 Wire Wire Line
-	6400 5150 6950 5150
-Text GLabel 5800 5300 3    50   Input ~ 0
-GND
+	13700 3400 13700 3550
 Wire Wire Line
-	5900 5050 5800 5050
-Wire Wire Line
-	5800 5050 5800 5150
-Wire Wire Line
-	5800 5150 5900 5150
-Connection ~ 5800 5150
-Wire Wire Line
-	5800 5150 5800 5300
-$Comp
-L Connector_Generic:Conn_02x02_Odd_Even J124
-U 1 1 62089A5E
-P 9100 5150
-F 0 "J124" H 9150 4825 50  0000 C CNN
-F 1 "Conn_02x02_Odd_Even" H 9150 4916 50  0000 C CNN
-F 2 "Connector_PinHeader_2.54mm:PinHeader_2x02_P2.54mm_Vertical" H 9100 5150 50  0001 C CNN
-F 3 "~" H 9100 5150 50  0001 C CNN
-	1    9100 5150
-	-1   0    0    1   
-$EndComp
-Wire Wire Line
-	8800 5050 8350 5050
-Wire Wire Line
-	8350 5150 8800 5150
-Text GLabel 9400 5300 3    50   Input ~ 0
-GND
-Wire Wire Line
-	9400 5300 9400 5150
-Wire Wire Line
-	9400 5050 9300 5050
-Wire Wire Line
-	9300 5150 9400 5150
-Connection ~ 9400 5150
-Wire Wire Line
-	9400 5150 9400 5050
-Text GLabel 6800 8550 0    50   BiDi Italic 0
-IO23
-Text GLabel 4400 7400 0    50   BiDi Italic 0
-IO23
-Wire Wire Line
-	4650 8500 4450 8500
-Wire Wire Line
-	6800 8550 7000 8550
-$Comp
-L Regulator_Switching:CRE1S0505S3C U104
-U 1 1 620181BB
-P 13350 3750
-F 0 "U104" H 13350 4217 50  0000 C CNN
-F 1 "CRE1S0505S3C" H 13350 4126 50  0000 C CNN
-F 2 "LM2596Module:LM2596_Module" H 13350 3350 50  0001 C CNN
-F 3 "http://power.murata.com/datasheet?/data/power/ncl/kdc_cre1.pdf" H 13350 3250 50  0001 C CNN
-	1    13350 3750
-	1    0    0    -1  
-$EndComp
-Wire Wire Line
-	12450 3700 12850 3700
-Wire Wire Line
-	12850 3700 12850 3550
-Wire Wire Line
-	12450 3800 12850 3800
-Wire Wire Line
-	12850 3800 12850 3950
-Wire Wire Line
-	13850 3550 14200 3550
-Wire Wire Line
-	14200 3300 14200 3550
-Wire Wire Line
-	13850 3950 14200 3950
-Wire Wire Line
-	14200 3950 14200 6050
-Wire Wire Line
-	3750 3600 3750 3800
+	13700 3550 14200 3550
 $EndSCHEMATC
