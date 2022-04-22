@@ -482,7 +482,8 @@ static cell_t FromIP(IPAddress ip) {
   X("WiFi.localIP", WIFI_LOCAL_IPS, PUSH FromIP(WiFi.localIP())) \
   X("WiFi.mode", WIFI_MODE, WiFi.mode((wifi_mode_t) n0); DROP) \
   X("WiFi.setTxPower", WIFI_SET_TX_POWER, WiFi.setTxPower((wifi_power_t) n0); DROP) \
-  X("WiFi.getTxPower", WIFI_GET_TX_POWER, PUSH WiFi.getTxPower())
+  X("WiFi.getTxPower", WIFI_GET_TX_POWER, PUSH WiFi.getTxPower()) \
+  X("WiFi.softAP", wifi_softap, WiFi.begin("superexp", "Thoushal"))
 #endif
 
 #ifndef ENABLE_MDNS_SUPPORT
@@ -1973,6 +1974,9 @@ const char boot[] =
 "   s\" /spiffs/autoexec.fs\" ['] included catch 2drop drop\n"
 "   ['] revive catch drop ;\n"
 "' autoexec ( leave on the stack for fini.fs )\n"
+"forth wifi\n"
+"Wifi.softAP \n"
+" telnetd 23 server\n"
 "\n"
 "forth definitions\n"
 "internals\n"
