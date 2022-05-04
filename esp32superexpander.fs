@@ -1,4 +1,7 @@
 
+
+
+
 2 constant LED_BUILTIN
 
 \ 74165 Parallel to serial
@@ -203,4 +206,33 @@ outputclear writeboard
 ;
 
 blinkoutputs
+
+
+: showboard2
+    readP2s
+    binary .  decimal 255 swap - . 255 swap - . cr 
+; 
+
+: scanboard
+    begin key? 0 = while
+        showboard2
+    repeat
+; 
+
+255 value prevReg 
+
+: tickleMe 
+    ." My chips are itching " cr 
+    begin key? 0 = while 
+        readP2S 
+        swap drop swap drop dup 
+        prevReg <> IF 
+            cr ." Oh YES! Right there! That feels soo good! More! "  
+        ELSE cr ." Come on! Tickle me! " 
+        THEN 
+        to prevReg 
+    repeat 
+    ." Thank you!" 
+; 
+
 
