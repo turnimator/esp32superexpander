@@ -1,4 +1,0 @@
-(sym_lib_table
-  (lib (name BOB-12009)(type Legacy)(uri /home/atle/Downloads/BOB-12009/BOB-12009.lib)(options "")(descr ""))
-  (lib (name ESP32wShiftRegisters-rescue)(type Legacy)(uri ${KIPRJMOD}/ESP32wShiftRegisters-rescue.lib)(options "")(descr ""))
-)
