@@ -4,3 +4,6 @@ ESP32superexpander       -  The current Kicad files
 Superexpander            - Arduino library for Suoerexpander
 SuperExpander.odt        - A description of the project
 superexpanderSupport.c   - Code to add to ESP32forth 
+
+A document explaining the Forth code:
+https://docs.google.com/document/d/1MlfXAm6yeVxjHgzF-E0LGG0kIZ7gFkiAXZAdYF-DrEk/edit?usp=sharing
